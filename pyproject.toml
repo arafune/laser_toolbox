@@ -5,8 +5,11 @@ description = "Tool box for laser spectroscopy"
 readme = "README.md"
 authors = [{ name = "Ryuichi Arafune", email = "ryuichi.arafune@gmail.com" }]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["numpy>=1.26", "sympy>=1.14.0"]
 
 [build-system]
 requires = ["uv_build>=0.9.22,<0.10.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=9.0.2", "pytest-cov>=7.0.0", "ruff>=0.14.10", "ty>=0.0.9"]
