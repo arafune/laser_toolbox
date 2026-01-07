@@ -1,0 +1,157 @@
+---
+title: "Prism Pair "
+author:
+  - Ryuichi Arafune
+keywords: [GVD, GDD, Prism Pair]
+format:
+  html:
+    toc: true
+    math: mathjax
+    html:
+      eqn-number: all
+  pdf:
+    pdf-engine: lualatex
+    toc: true
+    classoption: a4paper
+    geometry:
+      - margin=25mm
+abstract: |
+  This note describes how to calculate the dispersion characteristics of a prism pair.
+execute:
+  enabled: true
+jupyter: python3
+---
+
+# Geometry of Prism Pair
+
+![Prism Pair Geometry](PrismPair_geometry.svg){#fig-prism-pair-geometry}
+
+@fig-prism-pair-geometry shows the geometry of a prism pair. 
+Set the apex of the first prism ($O_1$) as the origin of the coordinate system.
+And the base is parallel to the $x$-axis of the coordinate system.
+The second prism apex ($O_2$) is located at $(W, -H)$ ($H>0,\, W>0$).
+And for convenience, the unit vectors $\boldsymbol{u}_1$ and $\boldsymbol{u}_2$ are defined as shown in @fig-prism-pair-geometry.
+The apex angle of the prism is $\alpha$, and the refractive index is $n$.
+Both base of the prisms are parallel to each other.
+The incident angle and the refraction angle at the first surface of the prism (at Point A) are $\theta_0$ and $\theta_1$,
+respectively.
+The refraction angles at the second surface (at Point B) are $\theta_2$ and $\theta_3$.
+On the second prism, the refraction angles at Point C are $\theta_4$ and $\theta_5$, and 
+at Point D are $\theta_6$ and $\theta_7$.
+The angles are related by Snell's law.
+
+The GDD is described as follows:
+\begin{equation}
+GDD = \frac{\lambda^3}{2 \pi c^2} \frac{d^2 }{d \lambda^2} \left[n(\lambda) (P_{AB}+ P_{CD})+ P_{BC}\right]
+\label{eq:gdd}
+\end{equation}
+where, $P_{AB}$ is the path length in the first prism, $P_{CD}$ is the path length in the second prism, and $P_{BC}$ is the path length in the air between the two prisms.
+The ray is incident on the first prism at point A, and exits from the second prism at point D.
+The path $P_{O_1A}$ and $P_{O_2C}$ are the input parameters.
+
+Further, the incident angle $\theta_0$ is also the input parameter.
+
+And the distance between the two prisms $W$ and $H$ are also the input parameters.
+(Or other quantity that describes the distance between the two prisms may be appropriate.)
+
+$$
+\begin{aligned}
+P_{O_1 O_2} &= \sqrt{W^2 + H^2}\\
+\end{aligned}
+$$
+
+
+
+$$
+\begin{aligned}
+\theta_1 + \theta_2 &= \alpha \\
+\theta_3 &= \theta_4 \\
+\theta_2 &= \theta_5 \\
+\theta_1 &= \theta_6 \\
+\theta_0 &= \theta_7 
+\end{aligned}
+$$
+
+# Physical distance between A and B (In the prism)
+
+As $P_{AB} \cos \theta_2 = P_{O_1A} \sin \alpha$,
+\begin{equation}
+P_{AB} = P_{O_1 A} \frac{  \sin \alpha}{ \cos\theta_2}
+\end{equation}
+
+
+
+$P_{O_1 B}$ is the length between the apex and the exit point of the ray in the first prism. 
+As, $P_{O_1 B} = P_{O_1 A} \cos \alpha + P_{AB} \sin \theta_2$, thus
+
+$P_{O_1B} = P_{O_1A}\frac{\cos \theta_1}{\cos \theta_2}$ 
+
+
+# Physical distance between C and D (In the prism)
+
+Likewise, $P_{CD}$ can be calculated as follows:
+
+\begin{equation}
+P_{CD} = P_{O_2 C} \frac{\sin \alpha}{\cos \theta_6} = P_{O_2 C} \frac{\sin \alpha}{\cos \theta_1}
+\end{equation}
+
+$P_{O_2C}$ does not depend on the wavelength, $\theta_1$ depends on lambda.
+
+# Physical distance between B and C (In air)
+
+The projection of $BC$ to $\boldsymbol{u}_2$ is same as the projection of $O_1 O_2$ to $\boldsymbol{u}_2$.
+The length is $s$ (The gap distance between the prism pair along $\boldsymbol{u}_2$).
+
+$\boldsymbol{u}_0  = (\cos \alpha/2, \sin \alpha /2)$
+and
+$O_1 O_2 = (W, -H)$, 
+
+Thus, 
+$$
+\begin{aligned}
+P_{BC} \cos \theta_3 = \boldsymbol{u}_2 \cdot O_1 O_2 = W \cos (\alpha/2) - H \sin (\alpha/2)
+\end{aligned}
+$$
+
+\begin{equation}
+P_{BC} = \frac{W \cos (\alpha/2) - H \sin (\alpha/2)}{\cos \theta_3}
+\end{equation}
+
+
+# A problem.
+
+As W and H which deteremines the distance between the two prisms, $P_{O_1 A}$ and $P_{O_2 C}$ which are the length between the incident point of each prism, are input parameters,
+and they can be measured directly.  $\alpha$ is given. $n(\lambda)$ is calculable. Thus, to calculate Eq. \eqref{eq:gdd}, it seems to be completely straight forward.
+However, there is a problem here.
+
+$W$, $H$, $P_{O_1 A}$ and $P_{O_2 C}$  are not independent.
+
+One way to overcome this difficulty is taking $O_1 O_2$ instead of $W$ and $H$. However, square root appears in the expression, and it is not convenient.
+Thus, the other way is taken: the projection $O_1 O_2$ along $\boldsymbol{u}_1 = (\cos \alpha/2, -\sin \alpha/2)$:
+
+\begin{equation}
+L \equiv O_1 O_2 \cdot \boldsymbol{u}_1 = W \cos (\alpha/2) + H \sin (\alpha/2).
+\end{equation}
+While the length $L$ is not so easy to measure dWhile the length $L$ is not so easy to measure directly,
+it is free from the problem mentioned above, and its quantity is similar size of the apex distance of the prism.
+
+Thus, the problem is by using $L$, and $P_{O_1 A}$ and $P_{O_2 C}$ as input parameters, how to determine $W$ and $H$.
+Once, the $W$ and $H$ are determined, as $\theta_3$ can be determined, and then $P_{BC}$ can be calculated.
+Note that we do not need to take into account the material dispersion to determine $W$ and $H$ from $L$ and $P_{O_1}$ and $P_{O_2}$.
+
+# Determine Position B and C.
+
+
+
+$B = ( P_{O_1B} \sin (\alpha/2), -P_{O_1B} \cos (\alpha/2) )$
+
+
+Likewise, the coordinate for the position C is:
+$C = (W - P_{O_2C} \sin (\alpha/2), -H + P_{O_2C} \cos (\alpha/2) )$
+
+From the slope of line BC, we can determine the angle $\theta_3$ as follows:
+$\tan (-\theta_3 +\alpha/2) = \frac{ -H + P_{O_2C} \cos (\alpha/2) + P_{O_1B} \cos (\alpha/2) }{ W - P_{O_2C} \sin (\alpha/2) - P_{O_1B} \sin (\alpha/2)  }$
+
+
+
+
