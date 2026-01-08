@@ -45,9 +45,10 @@ The angles are related by Snell's law.
 
 The GDD is described as follows:
 $$
-GDD = \frac{\lambda^3}{2 \pi c^2} \frac{d^2 }{d \lambda^2} \left[n(\lambda) (P_{AB}+ P_{CD})+ P_{BC}\right]
+GDD = \frac{\lambda^3}{2 \pi c^2} \frac{d^2 }{d \lambda^2} \left[n(\lambda) (P_{AB}+ P_{CD})+ P_{BC}\right] \times 2
 $${#eq-gdd}
 where, $P_{AB}$ is the path length in the first prism, $P_{CD}$ is the path length in the second prism, and $P_{BC}$ is the path length in the air between the two prisms.
+The factor 2 accounts for the symmetric double-pass geometry.
 The ray is incident on the first prism at point A, and exits from the second prism at point D.
 The path $P_{O_1A}$ and $P_{O_2C}$ are the input parameters.
 
@@ -76,7 +77,7 @@ $$
 
 # Physical distance between A and B (In the prism)
 
-As $P_{AB} \cos \theta_2 = P_{O_1A} \sin \alpha$,
+As $P_{AB} \cos\theta_2 = P_{O_1A} \sin \alpha$,
 $$
 P_{AB} = P_{O_1 A} \frac{\sin \alpha}{\cos\theta_2}
 $$ {#eq-PAB}
@@ -95,8 +96,7 @@ Likewise, $P_{CD}$ can be calculated as follows:
 
 $$
 P_{CD} = P_{O_2 C} \frac{\sin \alpha}{\cos \theta_6} = P_{O_2 C} \frac{\sin \alpha}{\cos \theta_1}
-$$
-{#eq-PCD}
+$$ {#eq-PCD}
 
 $P_{O_2C}$ does not depend on the wavelength, $\theta_1$ depends on lambda.
 
@@ -161,22 +161,62 @@ With the definition of $L$, we have described W and H by the input parameters:
 #| echo: false
 
 import sympy as sp
-from sympy import symbols, solve, simplify, tan, cos, sin, trigsimp, expand_trig
+from sympy import symbols, solve, simplify, tan, cos, sin, sec, trigsimp, expand_trig
 sp.init_printing()
 
 alpha, theta3, l1, l2, W, H, L = symbols('alpha theta3 l1 l2 W H L', real=True, positive=True)
-eq1 = tan(alpha/2 - theta3) - ((-H + l2*cos(alpha/2) + l1*cos(alpha/2)) / 
+eq1: sp.Expr = tan(alpha/2 - theta3) - ((-H + l2*cos(alpha/2) + l1*cos(alpha/2)) / 
                                (W - l2*sin(alpha/2) + l1*sin(alpha/2)))
-eq2 = L - (W*cos(alpha/2) + H*sin(alpha/2))
-sols = solve([eq1, eq2], [W, H])
-sols
+eq2: sp.Expr = L - (W*cos(alpha/2) + H*sin(alpha/2))
+sols: sp.Expr = solve([eq1, eq2], [W, H])
+simplify(sols)
+#clean_sols = {var: trigsimp(expand_trig(expr)) for var, expr in sols.items()}
+#clean_sols
 ```
 
-# Derivatives of optical path respect to lambda
+# Derivatives of optical path with respect to lambda
 
-## path in prism (AB and CD) 
+## Path in prism (AB and CD) 
 
 From @eq-PAB, $\frac{d^2P_{AB}}{d\lambda^2}$ is calculated as follows:
+Note that $\frac{n}{\cos \theta_2}$ depends on $\lambda$ through $\theta_2$ and $n$.
+The second derivative of $\frac{n(\lambda)}{\cos \theta (\lambda)}$ by $\lambda$ is :
+```{python}
+#| echo: false
+lamb = sp.symbols('lambda', real=True, positive=True)
+n = sp.Function('n', real=True)(lamb)
+theta = sp.Function('theta', real=True)(lamb)
 
+expr = n/sp.cos(theta)
+
+d_expr = sp.diff(expr, lamb, 2)
+
+trigsimp(expand_trig(d_expr))
+```
+
+$\theta_2 = \alpha - \sin^{-1}(\frac{\sin \theta_0}{n})$
+(Because of Snell's law: $\frac{\sin \theta_0}{n} = \sin \theta_1 = \sin(\alpha - \theta_2)$)
+
+From @eq-PCD, we consider the derivative of $\frac{n(\lambda)}{\cos \theta_1(\lambda)}$ similarly.
+$\theta_1 = \sin^{-1}(\frac{\sin \theta_0}{n})$
+
+Thus the (positive) GDD arising from the propagation through the prism and (negative) contribution because of 
+the angular dispersion ($d\theta_1/d\lambda$) over the medium can be calculated.
 
 ## Path in air (BC)
+From @eq-PBC, $\frac{d^2 P_{BC}}{d \lambda^2}$ is calculated as follows:
+the numerator does not depend on $\lambda$, thus only the derivative of $\frac{1}{\cos \theta_3}$ is calculated here.
+The second derivative of it is as follows:
+```{python}
+#| echo: false
+expr_2 = 1/sp.cos(theta)
+d_expr_2 = sp.diff(expr_2, lamb, 2)
+trigsimp(expand_trig(d_expr_2))
+```
+
+and 
+$\theta_3 = \sin^{-1}(n \sin(\sin^{-1}(\frac{\sin \theta_0}{n}) - \alpha))$,
+thus the (negative) GDD arising from the angular dispersion in the air gap can be calculated.
+( All refraction angles are defined positive when measured counterclockwise from the surface normal.)
+
+The rest is basically a coding issue.
