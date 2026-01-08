@@ -46,7 +46,7 @@ The angles are related by Snell's law.
 The GDD is described as follows:
 $$
 GDD = \frac{\lambda^3}{2 \pi c^2} \frac{d^2 }{d \lambda^2} \left[n(\lambda) (P_{AB}+ P_{CD})+ P_{BC}\right]
-$$ {#eq-gdd}
+$${#eq-gdd}
 where, $P_{AB}$ is the path length in the first prism, $P_{CD}$ is the path length in the second prism, and $P_{BC}$ is the path length in the air between the two prisms.
 The ray is incident on the first prism at point A, and exits from the second prism at point D.
 The path $P_{O_1A}$ and $P_{O_2C}$ are the input parameters.
@@ -77,9 +77,9 @@ $$
 # Physical distance between A and B (In the prism)
 
 As $P_{AB} \cos \theta_2 = P_{O_1A} \sin \alpha$,
-\begin{equation}
+$$
 P_{AB} = P_{O_1 A} \frac{\sin \alpha}{\cos\theta_2}
-\end{equation}
+$$ {#eq-PAB}
 
 
 
@@ -93,9 +93,10 @@ $P_{O_1B} = P_{O_1A}\frac{\cos \theta_1}{\cos \theta_2}$
 
 Likewise, $P_{CD}$ can be calculated as follows:
 
-\begin{equation}
+$$
 P_{CD} = P_{O_2 C} \frac{\sin \alpha}{\cos \theta_6} = P_{O_2 C} \frac{\sin \alpha}{\cos \theta_1}
-\end{equation}
+$$
+{#eq-PCD}
 
 $P_{O_2C}$ does not depend on the wavelength, $\theta_1$ depends on lambda.
 
@@ -115,15 +116,15 @@ P_{BC} \cos \theta_3 = \boldsymbol{u}_2 \cdot O_1 O_2 = W \cos (\alpha/2) - H \s
 \end{aligned}
 $$
 
-\begin{equation}
+$$
 P_{BC} = \frac{W \cos (\alpha/2) - H \sin (\alpha/2)}{\cos \theta_3}
-\end{equation}
+$$ {#eq-PBC}
 
 
 # Dependency of Prism Separation Parameters
 
 As W and H which determines the distance between the two prisms, $P_{O_1 A}$ and $P_{O_2 C}$ which are the length between the incident point of each prism, are input parameters,
-and they can be measured directly.  $\alpha$ is given. $n(\lambda)$ is calculable. Thus, to calculate Eq. \eqref{eq:gdd}, it seems to be completely straight forward.
+and they can be measured directly.  $\alpha$ is given. $n(\lambda)$ is calculable. Thus, to calculate @eq-gdd, it seems to be completely straight forward.
 However, there is a problem here.
 
 $W$, $H$, $P_{O_1 A}$ and $P_{O_2 C}$  are not independent.
@@ -141,18 +142,41 @@ Thus, the problem is how to determine $W$ and $H$ using $L$, and $P_{O_1 A}$ and
 Once, the $W$ and $H$ are determined, as $\theta_3$ can be determined, and then $P_{BC}$ can be calculated.
 Note that material dispersion does not need to be taken into account to determine $W$ and $H$ from $L$ and $P_{O_1}$ and $P_{O_2}$.
 
-# Determine Position B and C.
+## Relation between W, H and input parameters.
+
+For the simplicity, $P_{O_1 B} = l_1$ and  $P_{O_2 C} = l_2$ are defined.
+$l_1$ is not the input parameter,
+but it can be calculated from $P_{O_1 A}$ and $\theta_1$ and $\theta_2$ as described above.
+The position of point B in the coordinate system is
+$B = (l_1 \sin (\alpha/2), -l_1 \cos (\alpha/2) )$.
+Likewise, the coordinate for the position C is 
+$C = (W - l_2 \sin (\alpha/2), -H + l_2 \cos (\alpha/2) )$.
+From the slope of line BC, we can describe the following equation:
+$$
+\tan (-\theta_3 +\alpha/2) = \frac{ -H + l_2 \cos (\alpha/2) + l_1 \cos (\alpha/2)}
+{W - l_2 \sin (\alpha/2) - l_1 \sin (\alpha/2)}
+$$
+With the definition of $L$, we have described W and H by the input parameters:
+```{python}
+#| echo: false
+
+import sympy as sp
+from sympy import symbols, solve, simplify, tan, cos, sin, trigsimp, expand_trig
+sp.init_printing()
+
+alpha, theta3, l1, l2, W, H, L = symbols('alpha theta3 l1 l2 W H L', real=True, positive=True)
+eq1 = tan(alpha/2 - theta3) - ((-H + l2*cos(alpha/2) + l1*cos(alpha/2)) / 
+                               (W - l2*sin(alpha/2) + l1*sin(alpha/2)))
+eq2 = L - (W*cos(alpha/2) + H*sin(alpha/2))
+sols = solve([eq1, eq2], [W, H])
+sols
+```
+
+# Derivatives of optical path respect to lambda
+
+## path in prism (AB and CD) 
+
+From @eq-PAB, $\frac{d^2P_{AB}}{d\lambda^2}$ is calculated as follows:
 
 
-$B = ( P_{O_1B} \sin (\alpha/2), -P_{O_1B} \cos (\alpha/2) )$
-
-
-Likewise, the coordinate for the position C is:
-$C = (W - P_{O_2C} \sin (\alpha/2), -H + P_{O_2C} \cos (\alpha/2) )$
-
-From the slope of line BC, we can determine the angle $\theta_3$ as follows:
-$\tan (-\theta_3 +\alpha/2) = \frac{ -H + P_{O_2C} \cos (\alpha/2) + P_{O_1B} \cos (\alpha/2) }{ W - P_{O_2C} \sin (\alpha/2) - P_{O_1B} \sin (\alpha/2)  }$
-
-
-
-
+## Path in air (BC)
