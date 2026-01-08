@@ -102,7 +102,7 @@ $P_{O_2C}$ does not depend on the wavelength, $\theta_1$ depends on lambda.
 The projection of $BC$ to $\boldsymbol{u}_2$ is same as the projection of $O_1 O_2$ to $\boldsymbol{u}_2$.
 The length is $s$ (The gap distance between the prism pair along $\boldsymbol{u}_2$).
 
-$\boldsymbol{u}_0  = (\cos \alpha/2, \sin \alpha /2)$
+$\boldsymbol{u}_2  = (\cos \alpha/2, \sin \alpha /2)$
 and
 $O_1 O_2 = (W, -H)$, 
 
@@ -118,9 +118,9 @@ P_{BC} = \frac{W \cos (\alpha/2) - H \sin (\alpha/2)}{\cos \theta_3}
 \end{equation}
 
 
-# A problem.
+# Dependency of Prism Separation Parameters
 
-As W and H which deteremines the distance between the two prisms, $P_{O_1 A}$ and $P_{O_2 C}$ which are the length between the incident point of each prism, are input parameters,
+As W and H which determines the distance between the two prisms, $P_{O_1 A}$ and $P_{O_2 C}$ which are the length between the incident point of each prism, are input parameters,
 and they can be measured directly.  $\alpha$ is given. $n(\lambda)$ is calculable. Thus, to calculate Eq. \eqref{eq:gdd}, it seems to be completely straight forward.
 However, there is a problem here.
 
@@ -132,15 +132,14 @@ Thus, the other way is taken: the projection $O_1 O_2$ along $\boldsymbol{u}_1 =
 \begin{equation}
 L \equiv O_1 O_2 \cdot \boldsymbol{u}_1 = W \cos (\alpha/2) + H \sin (\alpha/2).
 \end{equation}
-While the length $L$ is not so easy to measure dWhile the length $L$ is not so easy to measure directly,
+While the length $L$ is not so easy to measure directly,
 it is free from the problem mentioned above, and its quantity is similar size of the apex distance of the prism.
 
-Thus, the problem is by using $L$, and $P_{O_1 A}$ and $P_{O_2 C}$ as input parameters, how to determine $W$ and $H$.
+Thus, the problem is how to determine $W$ and $H$ using $L$, and $P_{O_1 A}$ and $P_{O_2 C}$ as input parameters.
 Once, the $W$ and $H$ are determined, as $\theta_3$ can be determined, and then $P_{BC}$ can be calculated.
-Note that we do not need to take into account the material dispersion to determine $W$ and $H$ from $L$ and $P_{O_1}$ and $P_{O_2}$.
+Note that material dispersion does not need to be taken into account to determine $W$ and $H$ from $L$ and $P_{O_1}$ and $P_{O_2}$.
 
 # Determine Position B and C.
-
 
 
 $B = ( P_{O_1B} \sin (\alpha/2), -P_{O_1B} \cos (\alpha/2) )$
