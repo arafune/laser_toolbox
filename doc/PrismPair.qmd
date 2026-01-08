@@ -215,7 +215,7 @@ trigsimp(expand_trig(d_expr_2))
 ```
 
 and 
-$\theta_3 = \sin^{-1}(n \sin(\sin^{-1}(\frac{\sin \theta_0}{n}) - \alpha))$,
+$\theta_3 = \sin^{-1}(n \sin(\alpha - \sin^{-1}(\frac{\sin \theta_0}{n}) ))$,
 thus the (negative) GDD arising from the angular dispersion in the air gap can be calculated.
 ( All refraction angles are defined positive when measured counterclockwise from the surface normal.)
 
