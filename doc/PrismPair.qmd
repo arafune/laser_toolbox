@@ -200,7 +200,7 @@ $\theta_2 = \alpha - \sin^{-1}(\frac{\sin \theta_0}{n})$
 From @eq-PCD, we consider the derivative of $\frac{n(\lambda)}{\cos \theta_1(\lambda)}$ similarly.
 $\theta_1 = \sin^{-1}(\frac{\sin \theta_0}{n})$
 
-Thus the (positive) GDD arising from the propagation through the prism and (negative) contribution because of 
+Thus, the (positive) GDD arising from the propagation through the prism and (negative) contribution because of 
 the angular dispersion ($d\theta_1/d\lambda$) over the medium can be calculated.
 
 ## Path in air (BC)
@@ -216,7 +216,15 @@ trigsimp(expand_trig(d_expr_2))
 
 and 
 $\theta_3 = \sin^{-1}(n \sin(\alpha - \sin^{-1}(\frac{\sin \theta_0}{n}) ))$,
-thus the (negative) GDD arising from the angular dispersion in the air gap can be calculated.
+thus, the (negative) GDD arising from the angular dispersion in the air gap can be calculated.
 ( All refraction angles are defined positive when measured counterclockwise from the surface normal.)
 
 The rest is basically a coding issue.
+
+# The special case: Brewster angle prism pair
+Before going to forward calculations, let us consider the special case of the prism pair where the apex angle
+is $\alpha = \pi - 2 \theta_B = \pi-2 \tan^{-1}n$, where $\theta_B$ is the Brewster angle.
+And suppose that the incident angle $\theta_0$ is the Brewster angle, i.e., $\theta_0=\theta_B=\tan^{-1}( n)$.
+In this case, $\theta_0 = \theta_3 = \theta_4 = \theta_7 = \theta_B$, and $\theta_1 = \theta_2 = \theta_5 = \theta_6 = \alpha/2  = \pi/2 - \theta_B$
+
+
