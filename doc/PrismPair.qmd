@@ -57,8 +57,10 @@ Suppose the practical situation, we can measure:
 * $P_{O_2 C}$: The distance between the apex and the incident point of the second prism.
 * L: the distance between the two prisms along the beam path (the length of BC),  which is $\frac{s}{\cos\theta_3}$.
 
-While it might be difficult to measure $\theta_0$ accurately, in most pragmatical situations, it can be close to the Brewster angle.
-Thus, we assume that it is given as an input parameter.  And the apex angle $\alpha (=\theta_1 + \theta_2)$  is also given as an input parameter.
+While it might be difficult to measure $\theta_0$ accurately,
+in most pragmatical situations, it can be close to the Brewster angle.
+Thus, we assume that it is given as an input parameter.
+And the apex angle $\alpha (=\theta_1 + \theta_2)$  is also given as an input parameter.
 Thue, the angles $\theta_1$ and $\theta_3$ can be calculated by using Snell's law.
 From the Snell's law, the derivative of $\theta_1$ and $\theta_3$ can be calculated.
 
@@ -158,17 +160,26 @@ $$
 $$
 
 # Code 
+
+## Physicaol Unit
+
+Internally, the following physical units are used:
+
+* Length: micrometer (um)
+* Time: femtosecond (fs)
+* Angle: radian
+
 ## Input parameters
 
 The following properties are required to initialize the PrismPair class:
 
-* P_{O_1A}
-* P_{O_2C}
-* L
-* alpha (apex angle)
-* theta_0 (incident angle, default: None (=Brewster angle)):
+* P_{O_1A}_mm
+* P_{O_2C}_mm
+* L_mm
+* alpha_deg (apex angle)
+* theta_0_deg (incident angle, default: None (=Brewster angle)):
 * material (default: SF11)
-* wavelength (central wavelength, default: 800 nm)
+* wavelength_nm (central wavelength, default: 800 nm)
 
 The following properties are calculated inside the class:
 
