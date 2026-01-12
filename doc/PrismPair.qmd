@@ -33,7 +33,7 @@ jupyter: python3
 Set the apex of the first prism ($O_1$) as the origin of the coordinate system.
 And the base is parallel to the $x$-axis of the coordinate system.
 The second prism apex ($O_2$) is located at $(W, -H)$ ($H>0,\, W>0$).
-And for convenience, the unit vectors $\boldsymbol{u}_1$ and $\boldsymbol{u}_2$ are defined as shown in @fig-prism-pair-geometry.
+And for convenience, the unit vectors $\boldsymbol{u}_1$, $\boldsymbol{u}_2$ and $\boldsymbol{u}_3$ a are defined as shown in @fig-prism-pair-geometry.
 The apex angle of the prism is $\alpha$, and the refractive index is $n$.
 Both base of the prisms are parallel to each other.
 The incident angle and the refraction angle at the first surface of the prism (at Point A) are $\theta_0$ and $\theta_1$,
@@ -130,51 +130,88 @@ However, there is a problem here.
 $W$, $H$, $P_{O_1 A}$ and $P_{O_2 C}$  are not independent.
 
 One way to overcome this difficulty is taking $O_1 O_2$ instead of $W$ and $H$. However, square root appears in the expression, and it is not convenient.
+Thus, the other way is taken: the projection of $O_1 O_2$ along $\boldsymbol{u}_3 = (\sin \alpha/2, -\cos \alpha/2)$:
+$$
+t \equiv O_1 O_2 \cdot \boldsymbol{u}_3 = W \sin (\alpha/2) + H \cos (\alpha/2).
+$$
+While the length $t$ is not so easy to measure directly,
+it is free from the problem mentioned above, and its quantity is similar size of the apex distance of the prism.
+
 Thus, the other way is taken: the projection $O_1 O_2$ along $\boldsymbol{u}_1 = (\cos \alpha/2, -\sin \alpha/2)$:
 
 \begin{equation}
-L \equiv O_1 O_2 \cdot \boldsymbol{u}_1 = W \cos (\alpha/2) + H \sin (\alpha/2).
+t_2 \equiv O_1 O_2 \cdot \boldsymbol{u}_1 = W \cos (\alpha/2) + H \sin (\alpha/2).
 \end{equation}
-While the length $L$ is not so easy to measure directly,
+While the length $t_2$ is not so easy to measure directly,
 it is free from the problem mentioned above, and its quantity is similar size of the apex distance of the prism.
 
-Thus, the problem is how to determine $W$ and $H$ using $L$, and $P_{O_1 A}$ and $P_{O_2 C}$ as input parameters.
+Thus, the problem is how to determine $W$ and $H$ using $t_2$, and $P_{O_1 A}$ and $P_{O_2 C}$ as input parameters.
 Once, the $W$ and $H$ are determined, as $\theta_3$ can be determined, and then $P_{BC}$ can be calculated.
-Note that material dispersion does not need to be taken into account to determine $W$ and $H$ from $L$ and $P_{O_1}$ and $P_{O_2}$.
+Note that material dispersion does not need to be taken into account to determine $W$ and $H$ from $t_2$ and $P_{O_1}$ and $P_{O_2}$.
 
 ## Relation between W, H and input parameters.
 
-For the simplicity, $P_{O_1 B} = l_1$ and  $P_{O_2 C} = l_2$ are defined.
+For the simplicity, $P_{O_1 B} = l_1$ and $P_{O_2 C} = l_2$ are defined.
 $l_1$ is not the input parameter,
 but it can be calculated from $P_{O_1 A}$ and $\theta_1$ and $\theta_2$ as described above.
-The position of point B in the coordinate system is
-$B = (l_1 \sin (\alpha/2), -l_1 \cos (\alpha/2) )$.
-Likewise, the coordinate for the position C is 
-$C = (W - l_2 \sin (\alpha/2), -H + l_2 \cos (\alpha/2) )$.
-From the slope of line BC, we can describe the following equation:
+
+The projection $O_1 O_2$ to $\boldsymbol{u}_3 = (-\sin (\alpha/2), -\cos (\alpha/2))$
+is $(W, -H)\cdot(\sin\alpha/2, -\cos\alpha/2) = W\sin\alpha/2+H\cos\alpha/2$
+
+The projection of BC to $u_3$ is $P_{BC} \cos(\pi/2-\theta_3) =P_{BC}\sin\theta_3$.
+As 
 $$
-\tan (-\theta_3 +\alpha/2) = \frac{ -H + l_2 \cos (\alpha/2) + l_1 \cos (\alpha/2)}
-{W - l_2 \sin (\alpha/2) - l_1 \sin (\alpha/2)}
+W\sin(\alpha/2) + H \cos(\alpha/2) = P_{BC} \sin \theta_3 + l_1 + l_2
 $$
-With the definition of $L$, we have described W and H by the input parameters:
+
+$$
+\begin{aligned}
+l_1 + l_2 &= W\sin(\alpha/2) + H \cos(\alpha/2) - P_{BC} \sin \theta_3 \\
+&= W\sin(\alpha/2) + H \cos(\alpha/2) - \frac{W \cos (\alpha/2) - H \sin (\alpha/2)}{\cos \theta_3} \sin \theta_3 \\
+&= \frac{W\sin( \alpha/2 )\cos\theta_3+H\cos( \alpha/2 )\cos\theta_3-W\cos( \alpha/2 )\sin\theta_3+H\sin( \alpha/2 )\sin\theta_3}{\cos\theta_3} \\
+&= \frac{1}{\cos\theta_3} \left( W(\sin(\alpha/2 - \theta_3)+ H(\cos(\theta_3 - \alpha/2 ) \right) \\
+&= \frac{H \cos(\theta_3 - \alpha/2) - W \sin(\theta_3 -\alpha/2 )}{\cos \theta_3}
+\end{aligned}
+$$
+
 ```{python}
-#| echo: false
 
 import sympy as sp
-from sympy import symbols, solve, simplify, tan, cos, sin, sec, trigsimp, expand_trig
+from sympy import symbols, solve, factor, simplify, tan, cos, sin,  sec, trigsimp, expand_trig
 sp.init_printing()
 
-alpha, theta3, l1, l2, W, H, L = symbols('alpha theta3 l1 l2 W H L', real=True, positive=True)
-eq1: sp.Expr = tan(alpha/2 - theta3) - ((-H + l2*cos(alpha/2) + l1*cos(alpha/2)) / 
-                               (W - l2*sin(alpha/2) + l1*sin(alpha/2)))
-eq2: sp.Expr = L - (W*cos(alpha/2) + H*sin(alpha/2))
-sols: sp.Expr = solve([eq1, eq2], [W, H])
-simplify(sols)
-#clean_sols = {var: trigsimp(expand_trig(expr)) for var, expr in sols.items()}
-#clean_sols
+alpha, theta3, l1, l2, W, H, t, t2, s, pbc = symbols('alpha theta3 l1 l2 W H t t2 s pbc', real=True, positive=True)
+
+eq_slop: sp.Expr = tan(alpha/2 - theta3) - ((-H + l2*cos(alpha/2) + l1*cos(alpha/2)) / 
+                               (W - l2*sin(alpha/2) - l1*sin(alpha/2)))
+eq1: sp.Expr = H* cos(theta3-alpha/2)- W*sin(theta3 -alpha/2) - (l1 + l2)*cos(theta3)
+eq2: sp.Expr = t - (W*sin(alpha/2) + H*cos(alpha/2))
+eq3: sp.Expr = t2 - (W*cos(alpha/2) + H*sin(alpha/2))
+eq4: sp.Expr = s  - (W*sin(alpha/2) - H*cos(alpha/2))
+eq5: sp.Expr = pbc * cos(theta3)- (W*cos(alpha/2) - H*sin(alpha/2))
+
+sols_t: sp.Expr = solve([eq1, eq2], [W, H])
+sols_t2: sp.Expr = solve([eq1, eq3], [W, H])
+sols_s: sp.Expr = solve([eq1, eq4], [W, H])
+sols_pbc = sp.Expr = solve([eq1, eq5], [W, H])
+
+clean_sols_t = {var: trigsimp(expand_trig(expr)) for var, expr in sols_t.items()}
+clean_sols_t2 = {var: trigsimp(expand_trig(expr)) for var, expr in sols_t2.items()}
+clean_sols_s =  {var: trigsimp(expand_trig(expr)) for var, expr in sols_s.items()}
+clean_sols_pbc =  {var: trigsimp(expand_trig(expr)) for var, expr in sols_pbc.items()}
+
+clean_sols_pbc
 ```
 
-# Derivatives of optical path with respect to lambda
+
+```{python}
+clean_sols_t[W]
+```
+```{python}
+clean_sols_t[H]
+```
+
+# Derivatives of optical path with respect to wavelength
 
 ## Path in prism (AB and CD) 
 
@@ -195,7 +232,7 @@ trigsimp(expand_trig(d_expr))
 ```
 
 $\theta_2 = \alpha - \sin^{-1}(\frac{\sin \theta_0}{n})$
-(Because of Snell's law: $\frac{\sin \theta_0}{n} = \sin \theta_1 = \sin(\alpha - \theta_2)$)
+(Because of Snell's law: $\frac{\sin \theta_1}{n} = \sin \theta_1 = \sin(\alpha - \theta_2)$)
 
 From @eq-PCD, we consider the derivative of $\frac{n(\lambda)}{\cos \theta_1(\lambda)}$ similarly.
 $\theta_1 = \sin^{-1}(\frac{\sin \theta_0}{n})$
