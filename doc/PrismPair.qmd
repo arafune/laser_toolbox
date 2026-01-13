@@ -32,6 +32,8 @@ bibliography: refs.bib
 ![Prism Pair Geometry](PrismPair_geometry.svg){#fig-prism-pair-geometry}
 
 @fig-prism-pair-geometry shows the geometry of a prism pair. 
+Here, the bases of each prism are parallel to each other. 
+In this configuration, the beam exits from the second prism parallel to the incident beam.
 The second-order dispersion is described as below (Eq. 2-101 in the textbook [@ultrafastphenomena]):
 $$
 \begin{aligned}

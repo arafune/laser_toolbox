@@ -14,9 +14,9 @@ class _PrismInsert(NamedTuple):
 
 
 def ideal_apex_deg(
-    wavelength_nm: float | np.floating = 800.0,
+    wavelength_nm: ScalarOrArray = 800.0,
     material: str | Material = "SF11",
-) -> float:
+) -> ScalarOrArray:
     """Calculate the ideal apex angle for minimum deviation.
 
     Parameters
@@ -37,9 +37,20 @@ def ideal_apex_deg(
     prism_material: Material = (
         Material.from_str(material) if isinstance(material, str) else material
     )
+    if isinstance(wavelength_nm, np.ndarray):
+        assert np.all(wavelength_nm > 180), (
+            "wavelength_nm must be in nm and greater than 180 nm"
+        )
+        brewster_angle_deg_ = brewster_angle_deg(
+            wavelength_nm=wavelength_nm, material=material
+        )
+        alpha_rad = 2 * np.arcsin(
+            np.sin(np.deg2rad(brewster_angle_deg_))
+            / prism_material(wavelength_nm * 1e-3)
+        )
+        return np.rad2deg(alpha_rad)
     assert isinstance(wavelength_nm, (float, np.floating, int))
     assert wavelength_nm > 180, "wavelength_nm must be in nm and greater than 180 nm"
-    n = prism_material(wavelength_nm * 1e-3)
     brewster_angle_deg_ = brewster_angle_deg(
         wavelength_nm=wavelength_nm, material=material
     )
@@ -50,9 +61,9 @@ def ideal_apex_deg(
 
 
 def brewster_angle_deg(
-    wavelength_nm: float | np.floating = 800.0,
+    wavelength_nm: ScalarOrArray = 800.0,
     material: str | Material = "SF11",
-) -> float:
+) -> ScalarOrArray:
     """Calculate the Brewster angle for a given refractive index.
 
     Parameters
@@ -74,6 +85,12 @@ def brewster_angle_deg(
     prism_material: Material = (
         Material.from_str(material) if isinstance(material, str) else material
     )
+    if isinstance(wavelength_nm, np.ndarray):
+        assert np.all(wavelength_nm > 180), (
+            "wavelength_nm must be in nm and greater than 180 nm"
+        )
+        n = prism_material(wavelength_nm * 1e-3)
+        return np.rad2deg(np.arctan(n))
     assert isinstance(wavelength_nm, (float, np.floating, int))
     assert wavelength_nm > 180, "wavelength_nm must be in nm and greater than 180 nm"
     n = prism_material(wavelength_nm * 1e-3)
