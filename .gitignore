@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+doc/PrismPair.pdf
+doc/PrismPair_files/libs/clipboard/clipboard.min.js
+doc/PrismPair_files/libs/bootstrap
+doc/PrismPair_files/libs/quarto-html
+doc/PrismPair.html
+doc/PrismPair.quarto_ipynb

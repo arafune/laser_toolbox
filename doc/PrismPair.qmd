@@ -1,0 +1,195 @@
+---
+title: "Prism Pair "
+author:
+  - Ryuichi Arafune
+keywords: [GVD, GDD, Prism Pair]
+format:
+  html:
+    toc: true
+    math: mathjax
+    mathjax:
+      tex:
+        tags: all
+    html:
+      eqn-number: all
+  pdf:
+    pdf-engine: lualatex
+    toc: true
+    classoption: a4paper
+    geometry:
+      - margin=25mm
+abstract: |
+  This note describes how to calculate the dispersion characteristics of a prism pair.
+execute:
+  enabled: true
+jupyter: python3
+
+bibliography: refs.bib
+---
+
+# Geometry of Prism Pair
+
+![Prism Pair Geometry](PrismPair_geometry.svg){#fig-prism-pair-geometry}
+
+@fig-prism-pair-geometry shows the geometry of a prism pair. 
+The second-order dispersion is described as below (Eq. 2-101 in the textbook [@ultrafastphenomena]):
+$$
+\begin{aligned}
+\left.
+\frac{d^2 \Phi}{d\Omega^2} \right|_{\omega_l}
+&= \frac{L_g}{c}\left[2 \left. \frac{dn}{d\Omega}\right|_{\omega_l} + \omega_l \left.\frac{d^2n}{d\Omega^2}\right|_{\omega_l}\right] \\
+&- \frac{\omega_l}{c}\left(\frac{s}{\cos\theta_3}\right)
+\left(\left.\frac{d \theta_3}{d\Omega}\right|_{\omega_l}\right)^2
+- \frac{n \omega_l}{c}L_g\left(\left.\frac{d\theta_1}{d\Omega}\right|_{\omega_l}\right)^2
+\end{aligned}
+$$ {#eq-gdd-ultrafastphenomena}
+
+where, $L_g$ is the path length in the prism, $s$ is shown in @fig-prism-pair-geometry.
+The first term is the contribution of material dispersion in the prism (Positive GDD), 
+which equals to:
+$$
+\frac{\lambda^3}{2 \pi c^2} Lg \left. \frac{d^2 n }{d \lambda^2} \right|_{\lambda_l}
+$$
+The second and third terms are the contribution of angular dispersion in the air gap and in the prism (Negative GDD).
+Suppose the practical situation, we can measure:
+
+* $P_{O_1 A}$: The distance between the apex and the incident point of the first prism.
+* $P_{O_2 C}$: The distance between the apex and the incident point of the second prism.
+* L: the distance between the two prisms along the beam path (the length of BC),  which is $\frac{s}{\cos\theta_3}$.
+
+While it might be difficult to measure $\theta_0$ accurately,
+in most pragmatical situations, it can be close to the Brewster angle.
+Thus, we assume that it is given as an input parameter.
+And the apex angle $\alpha (=\theta_1 + \theta_2)$  is also given as an input parameter.
+Thue, the angles $\theta_1$ and $\theta_3$ can be calculated by using Snell's law.
+From the Snell's law, the derivative of $\theta_1$ and $\theta_3$ can be calculated.
+
+$$
+\frac{d}{d\Omega} \theta_1= - \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\frac{\sin\theta_0}{n} \frac{dn}{d\Omega}
+$$ {#eq-dtheta1-domega} 
+(note: the equations in the textbook (2-102) contain typos.)
+
+$$
+\begin{aligned}
+\frac{d}{d\Omega} \theta_3 &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
+\left[-n\cos(\alpha - \theta_1) \frac{d\theta_1}{d\Omega}
++ \sin(\alpha - \theta_1) \frac{dn}{d\Omega}\right] \\
+%  &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
+%  \left[n \cos(\alpha - \theta_1) \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\frac{\sin\theta_0}{n} \frac{dn}{d\Omega}
+%+ \sin(\alpha - \theta_1) \frac{dn}{d\Omega}\
+% \right] \\
+%  &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
+%  \left[
+%\cos(\alpha - \theta_1) \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\sin\theta_0 
+%+ \sin(\alpha - \theta_1)
+%\right]
+%\frac{dn}{d\Omega}
+\end{aligned}
+$$ {#eq-dtheta3-domega}
+(note: the equation in the textbook (Eq. (2-102)) contain typos.)
+
+
+$Lg$ is given as follows:
+$$
+L_g = \frac{\left(P_{O_1 A} \frac{\cos \theta_1}{\cos\theta_2} + P_{O_2 C} \right) \sin \alpha}{\cos \theta_1}
+$$
+
+As
+$$
+\frac{dn}{d\Omega} = -\frac{\lambda^2}{2 \pi c} \frac{dn}{d\lambda}
+$$ is computationally calculable by using Sellmeier equation, @eq-gdd-ultrafastphenomena can be computed.
+
+
+# Test by Brewster Angle Prism Pair
+
+Before going to forward to design the code, let's examine the particular case of Brewster angle prism pair, $\theta_0 = \tan^{-1}(n)$,
+Pragmatically, in many case, we may assume that the Brewster angle prisms and minimum deviation. In this case, 
+the following relation can be hold:
+$$
+\begin{aligned}
+\theta_0 &= \tan^{-1}(n) \\
+\sin\theta_0 &= \cos\theta_1 = \cos \theta_2 = \frac{n} {\sqrt{1+n^2}} \\
+\cos\theta_0 &= \sin\theta_1 = \sin\theta_2 = \frac{1} {\sqrt{1+n^2}} 
+\end{aligned}
+$$
+
+
+The derivative of $\theta_1$ can be simplified as follows:
+$$
+\begin{aligned}
+\frac{d}{d\Omega} \theta_1 &=  - \left[n^2 - \frac{n^2}{1+n^2} \right]^{-\frac{1}{2}} \left(\frac{1}{\sqrt{1+n^2}}\right)\frac{dn}{d\Omega} 
+= -\frac{1}{n^2} \left(\frac{dn}{d\Omega}\right) \\
+&= \frac{1}{n^2} \left(\frac{\lambda^2}{2\pi c}\frac{dn}{d\lambda}\right) \\
+\left( \frac{d}{d\Omega} \theta_1 \right)^2 &=
+ \frac{1}{n^4} \frac{\lambda^4}{4\pi c^2} \left( \frac{dn}{d\lambda}\right)^2 
+\end{aligned}
+$$
+
+Similarly, the derivative of $\theta_3$ can be simplified as follows:
+$$
+\begin{aligned}
+\frac{d}{d\Omega} \theta_3 &=
+ \left[1- n^2 \frac{1}{1+n^2}\right]^{-\frac{1}{2}}
+  \left[
+-n \cdot \frac{n}{\sqrt{1+n^2}} \cdot \frac{d\theta_1}{d\Omega}
++ \frac{1}{\sqrt{1+n^2}} \frac{dn}{d\Omega} \right] \\
+&= \sqrt{1+n^2} \left[\frac{n^2}{\sqrt{n^2+1}} \frac{d\theta_1}{d\Omega} + \frac{1}{\sqrt{1+n^2}} \frac{dn}{d\Omega}\right] \\
+& = \left(-n^2 \frac{d\theta_1}{d\Omega} + \frac{dn}{d\Omega}\right) = 2 \left(\frac{dn}{d\Omega} \right)\\
+\end{aligned}
+$$    
+
+
+## Negative GDD terms
+
+For particular case of Brewster angle prism pair, the second and third terms can be simplified as follows:
+$$
+\begin{aligned}
+- \frac{\omega_l}{c}\left(\frac{s}{\cos\theta_3}\right)
+\left(\left.\frac{d \theta_3}{d\Omega}\right|_{\omega_l}\right)^2 &=  \frac{-\omega_l}{c} 4L \left(\frac{dn}{d\Omega}\right)^2 \\
+&= \frac{-\lambda^3}{2 \pi c^2} 4L \left(\frac{dn}{d\lambda}\right)^2
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+&- \frac{n \omega_l}{c}L_g\left(\left.\frac{d\theta_1}{d\Omega}\right|_{\omega_l}\right)^2
+= - \frac{L_g}{n^3} \frac{\lambda^3}{2 \pi c^2}  \left( \frac{dn}{d\lambda}\right)^2
+\end{aligned}
+$$
+
+
+<!--
+
+# Code 
+
+## Physical Unit
+
+Internally, the following physical units are used:
+
+* Length: micrometer (um)
+* Time: femtosecond (fs)
+* Angle: radian
+
+## Input parameters
+
+The following properties are required to initialize the PrismPair class:
+
+* P_{O_1A}_mm
+* P_{O_2C}_mm
+* L_mm
+* alpha_deg (apex angle)
+* theta_0_deg (incident angle, default: None (=Brewster angle)):
+* material (default: SF11)
+* wavelength_nm (central wavelength, default: 800 nm)
+
+The following properties are calculated inside the class:
+
+* n (refractive index at the central wavelength)
+* theta_1, theta_2, theta_3 (angles inside the prism and at the exit)
+* Brewster angle (used as theta_0 if theta_0 is None)
+* Lg (path length inside the prism)
+* dtheta_1_lambda (derivative of $\theta_1$ at the central wavelength: @eq-dtheta1-domega in terms of wavelength)
+* dtheta_3_lambda (derivative of $\theta_3$ at the central wavelength: @eq-dtheta3-domega in terms of wavelength)
+* gdd (Calculate GDD at the central wavelength)
+
+-->
