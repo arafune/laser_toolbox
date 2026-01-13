@@ -24,23 +24,25 @@ def _():
         brewster_angle_deg,
         ideal_apex_deg,
     )
-    return PrismPair, mo, np, plt
+    return PrismPair, brewster_angle_deg, ideal_apex_deg, mo, np, plt
 
 
-app._unparsable_cell(
-    r"""
+@app.cell
+def _(mo):
+    mo.image(src="PrismPair_geometry_simple.svg", width=600)
+    return
+
+
+@app.cell
+def _(brewster_angle_deg, ideal_apex_deg, mo):
     material = "SF11"
     wavelength_nm = 800
     brewster_angle_deg_ = brewster_angle_deg(wavelength_nm, material=material)
     ideal_apex_deg_ = ideal_apex_deg(wavelength_nm, material)
     mo.md(
-        f"In the ideal situation, the apex angle for 800 nm light is **{ideal_apex_deg_}** degrees, because the Brewster angle of SF11 is **{brewster_angle_deg_}takn1224
-    
-        ** degrees.  Here we set the apex angle to be **59** degrees as  our prism, and incident angle is set **60** degrees."
+        f"In the ideal situation, the apex angle for 800 nm light is **{ideal_apex_deg_}** degrees, because the Brewster angle of SF11 is **{brewster_angle_deg_}** degrees.  Here we set the apex angle to be **59** degrees as  our prism, and incident angle is set **60** degrees."
     )
-    """,
-    name="_"
-)
+    return
 
 
 @app.cell
