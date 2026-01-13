@@ -96,7 +96,7 @@ $$
 
 As
 $$
-\frac{dn}{d\Omega} = -\frac{\lambda^2}{2 \pi c} \frac{dn}{d\lambda}
+\frac{dn}{d\Omega} = -\frac{\lambda_l^2}{2 \pi c} \frac{dn}{d\lambda}
 $$ is computationally calculable by using Sellmeier equation, @eq-gdd-ultrafastphenomena can be computed.
 
 
@@ -119,9 +119,9 @@ $$
 \begin{aligned}
 \frac{d}{d\Omega} \theta_1 &=  - \left[n^2 - \frac{n^2}{1+n^2} \right]^{-\frac{1}{2}} \left(\frac{1}{\sqrt{1+n^2}}\right)\frac{dn}{d\Omega} 
 = -\frac{1}{n^2} \left(\frac{dn}{d\Omega}\right) \\
-&= \frac{1}{n^2} \left(\frac{\lambda^2}{2\pi c}\frac{dn}{d\lambda}\right) \\
+&= \frac{1}{n^2} \left(\frac{\lambda_l^2}{2\pi c}\frac{dn}{d\lambda}\right) \\
 \left( \frac{d}{d\Omega} \theta_1 \right)^2 &=
- \frac{1}{n^4} \frac{\lambda^4}{4\pi c^2} \left( \frac{dn}{d\lambda}\right)^2 
+ \frac{1}{n^4} \frac{\lambda_l^4}{4\pi c^2} \left( \frac{dn}{d\lambda}\right)^2 
 \end{aligned}
 $$
 
@@ -133,7 +133,7 @@ $$
   \left[
 -n \cdot \frac{n}{\sqrt{1+n^2}} \cdot \frac{d\theta_1}{d\Omega}
 + \frac{1}{\sqrt{1+n^2}} \frac{dn}{d\Omega} \right] \\
-&= \sqrt{1+n^2} \left[\frac{n^2}{\sqrt{n^2+1}} \frac{d\theta_1}{d\Omega} + \frac{1}{\sqrt{1+n^2}} \frac{dn}{d\Omega}\right] \\
+&= \sqrt{1+n^2} \left[-\frac{n^2}{\sqrt{n^2+1}} \frac{d\theta_1}{d\Omega} + \frac{1}{\sqrt{1+n^2}} \frac{dn}{d\Omega}\right] \\
 & = \left(-n^2 \frac{d\theta_1}{d\Omega} + \frac{dn}{d\Omega}\right) = 2 \left(\frac{dn}{d\Omega} \right)\\
 \end{aligned}
 $$    
@@ -146,14 +146,14 @@ $$
 \begin{aligned}
 - \frac{\omega_l}{c}\left(\frac{s}{\cos\theta_3}\right)
 \left(\left.\frac{d \theta_3}{d\Omega}\right|_{\omega_l}\right)^2 &=  \frac{-\omega_l}{c} 4L \left(\frac{dn}{d\Omega}\right)^2 \\
-&= \frac{-\lambda^3}{2 \pi c^2} 4L \left(\frac{dn}{d\lambda}\right)^2
+&= \frac{-\lambda_l^3}{2 \pi c^2} 4L \left(\frac{dn}{d\lambda}\right)^2
 \end{aligned}
 $$
 
 $$
 \begin{aligned}
 &- \frac{n \omega_l}{c}L_g\left(\left.\frac{d\theta_1}{d\Omega}\right|_{\omega_l}\right)^2
-= - \frac{L_g}{n^3} \frac{\lambda^3}{2 \pi c^2}  \left( \frac{dn}{d\lambda}\right)^2
+= - \frac{L_g}{n^3} \frac{\lambda_l^3}{2 \pi c^2}  \left( \frac{dn}{d\lambda}\right)^2
 \end{aligned}
 $$
 

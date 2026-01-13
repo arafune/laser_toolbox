@@ -1,11 +1,9 @@
 """Unit tests for the pulselaser.prism_pair module."""
 
-from cmap.data.matlab import prism
-
 import numpy as np
 import pytest
 
-from laser_toolbox.prism_pair import PrismPair
+from laser_toolbox.prism_pair import PrismPair, brewster_angle_deg, ideal_apex_deg
 from laser_toolbox.sellmeier import Material
 
 
@@ -18,9 +16,9 @@ def sf11prisms() -> PrismPair:
     return PrismPair(
         wavelength_nm=800,
         incident_angle_deg=59.0,
-        separation=300.0,
-        prism_insert=(5.0, 10.0),
-        prism_material="sf11",
+        separation_mm=300.0,
+        prism_insert_mm=(5.0, 10.0),
+        material="sf11",
     )
 
 
@@ -35,28 +33,63 @@ def sf11prisms_woinsert() -> PrismPair:
     return PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(0.0, 0.0),
-        prism_material="sf11",
-        prism_apex=59.0,
+        separation_mm=300.0,
+        prism_insert_mm=(0.0, 0.0),
+        material="sf11",
+        apex_deg=59.0,
     )
 
 
 @pytest.fixture
 def sf11prism_brewster() -> PrismPair:
     """SF11 prism pair at Brewster angle @800nm."""
-    n: np.floating = Material.SF11(0.8)
-    brewster_angle: np.floating = np.rad2deg(np.arctan(n))
+    wavelength_nm = 800.0
+    brewster_angle_deg_: float = brewster_angle_deg(
+        wavelength_nm=wavelength_nm, material="SF11"
+    )
     return PrismPair(
-        wavelength_nm=800,
-        incident_angle_deg=brewster_angle,
-        separation=300.0,
-        prism_insert=(5, 10),
-        prism_material="sf11",
+        wavelength_nm=wavelength_nm,
+        incident_angle_deg=brewster_angle_deg_,
+        separation_mm=300.0,
+        prism_insert_mm=(5, 10),
+        material="sf11",
     )
 
 
 # ---------------   Test Case for Ideal Brewster Angle -----------------------
+
+
+def test_brewster_angle_deg() -> None:
+    """Test calculate_brewster_angle function."""
+    n_sf11_800nm = Material.SF11(0.8)
+    expected_brewster_angle_deg = np.rad2deg(np.arctan(n_sf11_800nm))
+
+    calculated_brewster_angle_deg = brewster_angle_deg(
+        wavelength_nm=800,
+        material="SF11",
+    )
+
+    np.testing.assert_allclose(
+        calculated_brewster_angle_deg,
+        expected_brewster_angle_deg,
+        rtol=1e-6,
+    )
+
+
+def test_ideal_apex_deg() -> None:
+    """Test calculate_brewster_angle function."""
+    expected_ideal_apex_deg = 59.0799589474000
+
+    calculated_ideal_apex_deg = ideal_apex_deg(
+        wavelength_nm=800,
+        material="SF11",
+    )
+
+    np.testing.assert_allclose(
+        calculated_ideal_apex_deg,
+        expected_ideal_apex_deg,
+        rtol=1e-6,
+    )
 
 
 class TestCaseBrewsterAngle:
@@ -99,10 +132,11 @@ class TestCaseBrewsterAngle:
         rhs_func,
     ) -> None:
         n: np.floating = Material.SF11(0.8)
-        brewster_angle = sf11prism_brewster.brewster_angle
+
+        brewster_angle_deg_ = brewster_angle_deg(800, material="SF11")
 
         np.testing.assert_allclose(
-            lhs_func(brewster_angle),
+            lhs_func(np.deg2rad(brewster_angle_deg_)),
             rhs_func(n),
             rtol=1e-6,
         )
@@ -219,9 +253,9 @@ def test_prism_pair_init_basic() -> None:
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 20.0),
-        prism_material="sf11",
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 20.0),
+        material="sf11",
     )
 
     assert pair.wavelength == 0.8
@@ -236,8 +270,8 @@ def test_prism_pair_negative_separation() -> None:
         PrismPair(
             wavelength_nm=800,
             incident_angle_deg=60.0,
-            separation=-1.0,
-            prism_insert=(5.0, 5.0),
+            separation_mm=-1.0,
+            prism_insert_mm=(5.0, 5.0),
         )
 
 
@@ -246,8 +280,8 @@ def test_prism_pair_negative_prism_insert_first() -> None:
         PrismPair(
             wavelength_nm=800,
             incident_angle_deg=60.0,
-            separation=100.0,
-            prism_insert=(-1.0, 5.0),
+            separation_mm=100.0,
+            prism_insert_mm=(-1.0, 5.0),
         )
 
 
@@ -256,8 +290,8 @@ def test_prism_pair_negative_prism_insert_second() -> None:
         PrismPair(
             wavelength_nm=800,
             incident_angle_deg=60.0,
-            separation=100.0,
-            prism_insert=(5.0, -1.0),
+            separation_mm=100.0,
+            prism_insert_mm=(5.0, -1.0),
         )
 
 
@@ -265,8 +299,8 @@ def test_prism_pair_gdd_returns_float() -> None:
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 10.0),
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 10.0),
     )
 
     gdd = pair.gdd
@@ -277,8 +311,8 @@ def test_prism_pair_gdd_is_deterministic() -> None:
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 10.0),
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 10.0),
     )
 
     assert pair.gdd == pair.gdd
@@ -289,8 +323,8 @@ def test_prism_pair_zero_insert_gdd_is_zero() -> None:
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(0.0, 0.0),
+        separation_mm=300.0,
+        prism_insert_mm=(0.0, 0.0),
     )
 
     assert abs(pair.gdd) < 1e-12
@@ -301,8 +335,8 @@ def test_prism_pair_zero_separation_gdd_is_zero() -> None:
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=0.0,
-        prism_insert=(10.0, 10.0),
+        separation_mm=0.0,
+        prism_insert_mm=(10.0, 10.0),
     )
 
     assert abs(pair.gdd) < 1e-12
@@ -312,15 +346,15 @@ def test_prism_pair_repr_scalar():
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 10.0),
-        prism_material="SF11",
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 10.0),
+        material="SF11",
     )
     r = repr(pair)
     assert "PrismPair(" in r
     assert "wavelength_nm=800.00 nm" in r
     assert "incident_angle_deg=60.00" in r
-    assert "prism_material='SF11'" in r
+    assert "material='SF11'" in r
 
 
 def test_prism_pair_repr_array(sf11prism_brewster: PrismPair):
@@ -328,30 +362,30 @@ def test_prism_pair_repr_array(sf11prism_brewster: PrismPair):
     pair = PrismPair(
         wavelength_nm=np.linspace(600, 900, 100),
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 10.0),
-        prism_material="SF11",
-        prism_apex=brewster_prism_angle,
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 10.0),
+        material="SF11",
+        apex_deg=brewster_prism_angle,
     )
     r = repr(pair)
     assert "array(100)" in r
     assert "PrismPair(" in r
-    assert "prism_material='SF11'" in r
+    assert "material='SF11'" in r
 
 
 def test_prism_pair_str_scalar():
     pair = PrismPair(
         wavelength_nm=800,
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 10.0),
-        prism_material="SF11",
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 10.0),
+        material="SF11",
     )
     s = str(pair)
     assert "PrismPair(" in s
     assert "wavelength_nm=800.00 nm" in s
     assert "incident_angle_deg=60.00" in s
-    assert "prism_material=SF11" in s
+    assert "material=SF11" in s
 
 
 def test_prism_pair_str_array(sf11prism_brewster: PrismPair):
@@ -359,12 +393,12 @@ def test_prism_pair_str_array(sf11prism_brewster: PrismPair):
     pair = PrismPair(
         wavelength_nm=np.linspace(600, 900, 100),
         incident_angle_deg=60.0,
-        separation=300.0,
-        prism_insert=(10.0, 10.0),
-        prism_material="SF11",
-        prism_apex=brewster_prism_angle,
+        separation_mm=300.0,
+        prism_insert_mm=(10.0, 10.0),
+        material="SF11",
+        apex_deg=brewster_prism_angle,
     )
     s = str(pair)
     assert "array(100)" in s
     assert "PrismPair(" in s
-    assert "prism_material=SF11" in s
+    assert "material=SF11" in s

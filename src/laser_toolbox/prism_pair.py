@@ -2,7 +2,6 @@
 
 from typing_extensions import override
 from typing import NamedTuple, Final
-from functools import cached_property
 import numpy as np
 
 from .sellmeier import Material
@@ -12,6 +11,73 @@ from .types import ScalarOrArray, Scalar
 class _PrismInsert(NamedTuple):
     first: float
     second: float
+
+
+def ideal_apex_deg(
+    wavelength_nm: float | np.floating = 800.0,
+    material: str | Material = "SF11",
+) -> float:
+    """Calculate the ideal apex angle for minimum deviation.
+
+    Parameters
+    ----------
+    wavelength_nm
+        Wavelength in nm.
+
+    material
+        The material of the prism. Default is "SF11".
+
+    Returns
+    -------
+    Scalar
+        Ideal apex angle in degrees.
+
+    """
+
+    prism_material: Material = (
+        Material.from_str(material) if isinstance(material, str) else material
+    )
+    assert isinstance(wavelength_nm, (float, np.floating, int))
+    assert wavelength_nm > 180, "wavelength_nm must be in nm and greater than 180 nm"
+    n = prism_material(wavelength_nm * 1e-3)
+    brewster_angle_deg_ = brewster_angle_deg(
+        wavelength_nm=wavelength_nm, material=material
+    )
+    alpha_rad = 2 * np.arcsin(
+        np.sin(np.deg2rad(brewster_angle_deg_)) / prism_material(wavelength_nm * 1e-3)
+    )
+    return float(np.rad2deg(alpha_rad))
+
+
+def brewster_angle_deg(
+    wavelength_nm: float | np.floating = 800.0,
+    material: str | Material = "SF11",
+) -> float:
+    """Calculate the Brewster angle for a given refractive index.
+
+    Parameters
+    ----------
+    wavelength_nm
+        Wavelength in nm.
+
+    material
+        The material of the prism. Default is "SF11".
+
+
+    Returns
+    -------
+    Scalar
+        Brewster angle in degrees.
+
+    """
+
+    prism_material: Material = (
+        Material.from_str(material) if isinstance(material, str) else material
+    )
+    assert isinstance(wavelength_nm, (float, np.floating, int))
+    assert wavelength_nm > 180, "wavelength_nm must be in nm and greater than 180 nm"
+    n = prism_material(wavelength_nm * 1e-3)
+    return float(np.rad2deg(np.arctan(n)))
 
 
 class PrismPair:
@@ -56,11 +122,11 @@ class PrismPair:
     def __init__(  # noqa: PLR0913
         self,
         incident_angle_deg: Scalar,
-        separation: Scalar,
-        prism_insert: tuple[float, float],
-        prism_apex: float | None = None,
+        separation_mm: Scalar,
+        prism_insert_mm: tuple[float, float],
+        apex_deg: float | None = None,
         wavelength_nm: ScalarOrArray | None = None,
-        prism_material: str | Material = "SF11",
+        material: str | Material = "SF11",
     ) -> None:
         r"""Initialize PrismPair class.
 
@@ -74,15 +140,15 @@ class PrismPair:
             The tuple for the insert length (mm) of the prism (l_1, l_2).
         wavelength_nm
             Wavelength of light, if None, use 800 nm.
-        prism_apex
+        apex_deg
             The apex angle of the prism (degrees) if None, use Brewster angle of the input wavelength.
-        prism_material
+        material
             The material of the prism. Default is "SF11".
 
         """
-        assert separation >= 0
-        assert prism_insert[0] >= 0
-        assert prism_insert[1] >= 0
+        assert separation_mm >= 0
+        assert prism_insert_mm[0] >= 0
+        assert prism_insert_mm[1] >= 0
 
         self.wavelength: ScalarOrArray = (
             0.8 if wavelength_nm is None else wavelength_nm * 1e-3
@@ -90,27 +156,32 @@ class PrismPair:
         assert np.all(self.wavelength < 3)
 
         self.material: Material = (
-            Material.from_str(prism_material)
-            if isinstance(prism_material, str)
-            else prism_material
+            Material.from_str(material) if isinstance(material, str) else material
         )
         self.theta_0: Scalar = np.deg2rad(incident_angle_deg)
-        self.separation: Scalar = separation * 1e3
+        self.separation: Scalar = separation_mm * 1e3
         self.prism_insert: _PrismInsert = _PrismInsert(
-            first=prism_insert[0] * 1e3,
-            second=prism_insert[1] * 1e3,
+            first=prism_insert_mm[0] * 1e3,
+            second=prism_insert_mm[1] * 1e3,
         )
-
-        self.alpha: Scalar = (
-            2 * np.arcsin(np.sin(self.brewster_angle) / self.material(self.wavelength))
-            if prism_apex is None
-            else np.deg2rad(prism_apex)
+        if apex_deg is None:
+            msg = f"wavelength_nm is {wavelength_nm}, and type is {type(wavelength_nm)}, which must be scalar when apex_deg is not set."
+            assert isinstance(self.wavelength, (np.floating, float, int)), msg
+            brewster_angle_deg_: float = brewster_angle_deg(
+                wavelength_nm=self.wavelength * 1e3, material=material
+            )
+            self.alpha: float | np.floating = 2 * np.arcsin(
+                np.sin(np.deg2rad(brewster_angle_deg_)) / self.material(self.wavelength)
+            )
+        else:
+            self.alpha = np.deg2rad(apex_deg)
+        assert isinstance(self.alpha, (np.floating, float)), (
+            f" apex is {self.alpha}. type of alpha is {type(self.alpha)}, not float / np.floating"
         )
-        assert isinstance(self.alpha, (np.floating, float))
 
     @override
     def __str__(self) -> str:
-        if isinstance(self.wavelength, (float, np.floating)):
+        if isinstance(self.wavelength, (float, np.floating, int)):
             wl_str = f"{self.wavelength * 1e3:.2f} nm"
         else:
             assert isinstance(self.wavelength, np.ndarray)
@@ -120,9 +191,9 @@ class PrismPair:
             f"  wavelength_nm={wl_str},\n"
             f"  incident_angle_deg={np.rad2deg(self.theta_0):.2f},\n"
             f"  separation_mm={self.separation / 1e3:.2f},\n"
-            f"  prism_insert_mm=({self.prism_insert.first / 1e3:.2f}, {self.prism_insert.second / 1e3:.2f}),\n"
-            f"  prism_apex_deg={np.rad2deg(self.alpha):.2f},\n"
-            f"  prism_material={self.material.name}\n"
+            f"  prism_insert_m=({self.prism_insert.first / 1e3:.2f}, {self.prism_insert.second / 1e3:.2f}),\n"
+            f"  apex_deg={np.rad2deg(self.alpha):.2f},\n"
+            f"  material={self.material.name}\n"
             f")"
         )
 
@@ -137,13 +208,13 @@ class PrismPair:
             f"PrismPair("
             f"wavelength_nm={wl_str}, "
             f"incident_angle_deg={np.rad2deg(self.theta_0):.2f}, "
-            f"separation_mm={self.separation / 1e3:.2f}, "
+            f"separation={self.separation / 1e3:.2f}, "
             f"prism_insert_mm=({self.prism_insert.first / 1e3:.2f}, {self.prism_insert.second / 1e3:.2f}), "
-            f"prism_apex_deg={np.rad2deg(self.alpha):.2f}, "
-            f"prism_material='{self.material.name}')"
+            f"apex={np.rad2deg(self.alpha):.2f}, "
+            f"material='{self.material.name}')"
         )
 
-    @cached_property
+    @property
     def n(self) -> ScalarOrArray:
         """Return the refractive index of the prism material at the given wavelength.
 
@@ -159,19 +230,7 @@ class PrismPair:
 
         raise TypeError("Index must be Scalar or Array")  # pragma: no cover
 
-    @cached_property
-    def brewster_angle(self) -> ScalarOrArray:
-        """Return the Brewster angle of the prism material at the given wavelength.
-
-        Returns
-        -------
-        ScalarOrArray
-            The Brewster angle in radians.
-
-        """
-        return np.arctan(self.n)
-
-    @cached_property
+    @property
     def theta_1(self) -> ScalarOrArray:
         """Return the refraction angle inside the prism.
 
@@ -183,7 +242,7 @@ class PrismPair:
         """
         return np.arcsin(np.sin(self.theta_0) / self.n)
 
-    @cached_property
+    @property
     def theta_2(self) -> ScalarOrArray:
         """Return the exit angle from the prism.
 
@@ -195,7 +254,7 @@ class PrismPair:
         """
         return self.alpha - self.theta_1
 
-    @cached_property
+    @property
     def theta_3(self) -> ScalarOrArray:
         """Return the exit angle from the prism.
 
@@ -207,7 +266,7 @@ class PrismPair:
         """
         return np.arcsin(self.n * np.sin(self.theta_2))
 
-    @cached_property
+    @property
     def p_ab(self) -> ScalarOrArray:
         r"""Reuturn the path of P_AB
 
@@ -218,7 +277,7 @@ class PrismPair:
         l1 = self.prism_insert.first
         return l1 * np.sin(self.alpha) / np.cos(self.theta_2)
 
-    @cached_property
+    @property
     def p_ob(self) -> ScalarOrArray:
         r"""Return the path of P_OB
 
@@ -230,14 +289,14 @@ class PrismPair:
         l1 = self.prism_insert.first
         return l1 * np.cos(self.theta_1) / np.cos(self.theta_2)
 
-    @cached_property
+    @property
     def p_od(self) -> ScalarOrArray:
         r"""Return the path of P_OD"""
 
         l2 = self.prism_insert.second
         return l2 * np.cos(self.theta_2) / np.cos(self.theta_1)
 
-    @cached_property
+    @property
     def lg(self) -> ScalarOrArray:
         r"""Return the path length in the prism.
 
@@ -247,7 +306,7 @@ class PrismPair:
         g = (self.p_ob + l2) * np.sin(self.alpha)
         return g / np.cos(self.theta_1)
 
-    @cached_property
+    @property
     def dn_dOmega(self) -> ScalarOrArray:
         """Return the derivative of refractive index with respect to angular frequency.
 
@@ -262,7 +321,7 @@ class PrismPair:
             return -(self.wavelength**2) / (2 * np.pi * self.c) * dn_dlambda
         raise TypeError("Index must be Scalar or Array")  # pragma: no cover
 
-    @cached_property
+    @property
     def dtheta1_dOmega(self) -> ScalarOrArray:
         r"""Return the derivative of theta_1 with respect to angular frequency.
 
@@ -281,7 +340,7 @@ class PrismPair:
             * self.dn_dOmega
         )
 
-    @cached_property
+    @property
     def dtheta3_dOmega(self) -> ScalarOrArray:
         r"""Return the derivative of theta_3 with respect to angular frequency.
 
@@ -299,7 +358,7 @@ class PrismPair:
             + np.sin(self.theta_2) * self.dn_dOmega
         )
 
-    @cached_property
+    @property
     def gdd_positive(self) -> ScalarOrArray:
         r"""Return the positive GDD contribution from the prism material.
 
@@ -322,7 +381,7 @@ class PrismPair:
             )
         raise TypeError("Index must be Scalar or Array")  # pragma: no cover
 
-    @cached_property
+    @property
     def gdd_negative(self) -> ScalarOrArray:
         r"""Return the negative GDD contribution from the prism pair geometry.
 
@@ -350,7 +409,7 @@ class PrismPair:
             return 2 * (gap_component + prism_component)
         raise TypeError("Index must be Scalar or Array")  # pragma: no cover
 
-    @cached_property
+    @property
     def gdd(self) -> ScalarOrArray:
         """Return GDD of prism pairs.
 
