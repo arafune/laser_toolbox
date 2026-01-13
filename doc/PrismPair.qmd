@@ -74,16 +74,16 @@ $$
 \frac{d}{d\Omega} \theta_3 &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
 \left[-n\cos(\alpha - \theta_1) \frac{d\theta_1}{d\Omega}
 + \sin(\alpha - \theta_1) \frac{dn}{d\Omega}\right] \\
-  &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
-  \left[n \cos(\alpha - \theta_1) \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\frac{\sin\theta_0}{n} \frac{dn}{d\Omega}
-+ \sin(\alpha - \theta_1) \frac{dn}{d\Omega}\
- \right] \\
-  &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
-  \left[
-\cos(\alpha - \theta_1) \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\sin\theta_0 
-+ \sin(\alpha - \theta_1)
-\right]
-\frac{dn}{d\Omega}
+%  &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
+%  \left[n \cos(\alpha - \theta_1) \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\frac{\sin\theta_0}{n} \frac{dn}{d\Omega}
+%+ \sin(\alpha - \theta_1) \frac{dn}{d\Omega}\
+% \right] \\
+%  &= \left[1- n^2 \sin^2(\alpha - \theta_1)\right]^{-\frac{1}{2}}
+%  \left[
+%\cos(\alpha - \theta_1) \left[n^2 - \sin^2\theta_0\right]^{-\frac{1}{2}}\sin\theta_0 
+%+ \sin(\alpha - \theta_1)
+%\right]
+%\frac{dn}{d\Omega}
 \end{aligned}
 $$ {#eq-dtheta3-domega}
 (note: the equation in the textbook (Eq. (2-102)) contain typos.)
@@ -94,7 +94,10 @@ $$
 L_g = \frac{\left(P_{O_1 A} \frac{\cos \theta_1}{\cos\theta_2} + P_{O_2 C} \right) \sin \alpha}{\cos \theta_1}
 $$
 
-As $dn/d\Omega$ is calculated by using Sellmeier equation. @eq-gdd-ultrafastphenomena can be calculated.
+As
+$$
+\frac{dn}{d\Omega} = -\frac{\lambda^2}{2 \pi c} \frac{dn}{d\lambda}
+$$ is computationally calculable by using Sellmeier equation, @eq-gdd-ultrafastphenomena can be computed.
 
 
 # Test by Brewster Angle Prism Pair
@@ -105,8 +108,8 @@ the following relation can be hold:
 $$
 \begin{aligned}
 \theta_0 &= \tan^{-1}(n) \\
-\sin\theta_0 = \cos\theta_1 = \cos \theta_2 &= \frac{n} {\sqrt{1+n^2}} \\
-\cos\theta_0 = \sin\theta_1 = \sin\theta_2 &= \frac{1} {\sqrt{1+n^2}} 
+\sin\theta_0 &= \cos\theta_1 = \cos \theta_2 = \frac{n} {\sqrt{1+n^2}} \\
+\cos\theta_0 &= \sin\theta_1 = \sin\theta_2 = \frac{1} {\sqrt{1+n^2}} 
 \end{aligned}
 $$
 
@@ -135,7 +138,6 @@ $$
 \end{aligned}
 $$    
 
-as $\frac{dn}{d\Omega} = - \frac{\lambda^2}{2 \pi c} \frac{dn}{d\lambda}$
 
 ## Negative GDD terms
 
@@ -148,10 +150,6 @@ $$
 \end{aligned}
 $$
 
-
-
-
-
 $$
 \begin{aligned}
 &- \frac{n \omega_l}{c}L_g\left(\left.\frac{d\theta_1}{d\Omega}\right|_{\omega_l}\right)^2
@@ -159,9 +157,12 @@ $$
 \end{aligned}
 $$
 
+
+<!--
+
 # Code 
 
-## Physicaol Unit
+## Physical Unit
 
 Internally, the following physical units are used:
 
@@ -190,3 +191,5 @@ The following properties are calculated inside the class:
 * dtheta_1_lambda (derivative of $\theta_1$ at the central wavelength: @eq-dtheta1-domega in terms of wavelength)
 * dtheta_3_lambda (derivative of $\theta_3$ at the central wavelength: @eq-dtheta3-domega in terms of wavelength)
 * gdd (Calculate GDD at the central wavelength)
+
+-->

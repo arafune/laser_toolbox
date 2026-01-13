@@ -455,6 +455,9 @@ def sf11(
     """
     b = (1.73759695, 0.313747346, 1.89878101)
     c = (0.013188707, 0.0623068142, 155.23629)
+    # https://refractiveindex.info/?shelf=specs&book=SCHOTT-optical&page=SF11
+    # b=(1.73848403, 0.311168974, 1.17490871)
+    # c = (0.0136068604, 0.0615960463, 121.922711)
     return three_term_sellmeier(
         lambda_micron,
         0,
