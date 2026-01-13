@@ -945,6 +945,7 @@ class Material(Enum):
     FUSED_SILICA = partial(fused_silica)
     UVFS = partial(fused_silica)  # noqa: PIE796
     CAF2 = partial(caf2)
+    CaF2 = partial(caf2)
     SF10 = partial(sf10)
     AIR = partial(air)
     ALPHA_BBO = partial(alpha_bbo)
@@ -952,6 +953,7 @@ class Material(Enum):
     QUARTZ = partial(quartz)
     CALCITE = partial(calcite)
     MGF2 = partial(mgf2)
+    MgF2 = partial(mgf2)
     SF11 = partial(sf11)
 
     def __call__(
