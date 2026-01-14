@@ -15,7 +15,7 @@ DispersionResult = float | np.ndarray | sp.Expr
 
 
 @overload
-def three_term_sellmeier(
+def sellmeier(
     lambda_micron: Scalar,
     coeff_a: float,
     coeffs_b: tuple[float, float, float],
@@ -27,7 +27,7 @@ def three_term_sellmeier(
 
 
 @overload
-def three_term_sellmeier(
+def sellmeier(
     lambda_micron: NDArray[np.floating],
     coeff_a: float,
     coeffs_b: tuple[float, float, float],
@@ -39,7 +39,7 @@ def three_term_sellmeier(
 
 
 @overload
-def three_term_sellmeier(
+def sellmeier(
     lambda_micron: Scalar,
     coeff_a: float,
     coeffs_b: tuple[float, float, float],
@@ -51,7 +51,7 @@ def three_term_sellmeier(
 
 
 @overload
-def three_term_sellmeier(
+def sellmeier(
     lambda_micron: NDArray[np.floating],
     coeff_a: float,
     coeffs_b: tuple[float, float, float],
@@ -62,7 +62,7 @@ def three_term_sellmeier(
 ) -> NDArray[np.floating]: ...
 
 
-def three_term_sellmeier(  # noqa: PLR0913
+def sellmeier(  # noqa: PLR0913
     lambda_micron: ScalarOrArray,
     coeff_a: float,
     coeffs_b: tuple[float, float, float],
@@ -135,100 +135,6 @@ def three_term_sellmeier(  # noqa: PLR0913
         "numpy",
     )
     return delta_n_np(lambda_micron, coeff_a, *coeffs_b, *coeffs_c)
-
-
-@overload
-def two_term_sellmeier(
-    lambda_micron: Scalar,
-    coeff_a: float,
-    coeffs_b: tuple[float, float],
-    coeffs_c: tuple[float, float],
-    derivative_order: int = 0,
-    *,
-    as_sympy: Literal[True],
-) -> sp.Expr: ...
-
-
-@overload
-def two_term_sellmeier(
-    lambda_micron: NDArray[np.floating],
-    coeff_a: float,
-    coeffs_b: tuple[float, float],
-    coeffs_c: tuple[float, float],
-    derivative_order: int = 0,
-    *,
-    as_sympy: Literal[True],
-) -> sp.Expr: ...
-
-
-@overload
-def two_term_sellmeier(
-    lambda_micron: NDArray[np.floating],
-    coeff_a: float,
-    coeffs_b: tuple[float, float],
-    coeffs_c: tuple[float, float],
-    derivative_order: int = 0,
-    *,
-    as_sympy: Literal[False] = False,
-) -> NDArray[np.floating]: ...
-
-
-@overload
-def two_term_sellmeier(
-    lambda_micron: Scalar,
-    coeff_a: float,
-    coeffs_b: tuple[float, float],
-    coeffs_c: tuple[float, float],
-    derivative_order: int = 0,
-    *,
-    as_sympy: Literal[False] = False,
-) -> np.floating: ...
-
-
-def two_term_sellmeier(  # noqa: PLR0913
-    lambda_micron: ScalarOrArray,
-    coeff_a: float,
-    coeffs_b: tuple[float, float],
-    coeffs_c: tuple[float, float],
-    derivative_order: int = 0,
-    *,
-    as_sympy: bool = False,
-) -> ScalarOrArray | sp.Expr:
-    r"""Return the Sellmeier function represented by two terms.
-
-    :math:`n^2 -1 = A + \frac{B_1 \lambda^2}{\lambda^2 - C_1} +
-    \frac{B_2 \lambda^2}{\lambda^2 - C_2}`.
-
-    Parameters
-    ----------
-    lambda_micron: float
-        wavelength in micron
-    coeff_a: float
-        coefficient A
-    coeffs_b: tuple[float, float]
-        Coefficients B_n
-    coeffs_c: tuple[float, float]
-        Coefficients C_n
-    derivative_order: int
-        Derivative order
-    as_sympy: bool
-        if True, return Sympy object
-
-
-    Returns
-    -------
-    float
-        Calculated refractive index
-
-    """
-    return three_term_sellmeier(
-        lambda_micron,
-        coeff_a,
-        (*coeffs_b, 0.0),
-        (*coeffs_c, 0.0),
-        derivative_order=derivative_order,
-        as_sympy=as_sympy,
-    )
 
 
 def air_dispersion(
@@ -320,7 +226,7 @@ def bk7(
     """
     b = (1.03961212, 0.231792344, 1.01046945)
     c = (0.00600069867, 0.0200179144, 103.560653)
-    return three_term_sellmeier(
+    return sellmeier(
         lambda_micron,
         0,
         b,
@@ -358,7 +264,7 @@ def fused_silica(
     b = (0.6961663, 0.4079426, 0.8974794)
     # Malitson form: C_i = lambda_i^2
     c = (0.06840432**2, 0.11624142**2, 9.8961612**2)
-    return three_term_sellmeier(
+    return sellmeier(
         lambda_micron,
         0,
         b,
@@ -391,7 +297,7 @@ def caf2(
     a = 0.33973
     b = (0.69913, 0.11994, 4.35181)
     c = (0.09374**2, 21.18**2, 38.46**2)
-    return three_term_sellmeier(
+    return sellmeier(
         lambda_micron,
         a,
         b,
@@ -423,7 +329,7 @@ def sf10(
     """
     b = (1.6215390, 0.256287842, 1.64447552)
     c = (0.0122241457, 0.0595736775, 147.468793)
-    return three_term_sellmeier(
+    return sellmeier(
         lambda_micron,
         0,
         b,
@@ -458,7 +364,7 @@ def sf11(
     # https://refractiveindex.info/?shelf=specs&book=SCHOTT-optical&page=SF11
     # b=(1.73848403, 0.311168974, 1.17490871)
     # c = (0.0136068604, 0.0615960463, 121.922711)
-    return three_term_sellmeier(
+    return sellmeier(
         lambda_micron,
         0,
         b,
@@ -717,14 +623,14 @@ def quartz(
 
     """
     coeff_e_a = 0.28851804
-    coeffs_e_b = (1.09509924, 1.15662475)
-    coeffs_e_c = (1.02101864 * 1e-2, 100)
+    coeffs_e_b = (1.09509924, 1.15662475, 0)
+    coeffs_e_c = (1.02101864 * 1e-2, 100, 0)
 
     coeff_o_a = 0.28604141
-    coeffs_o_b = (1.07044083, 1.10202242)
-    coeffs_o_c = (1.00585997 * 1e-2, 100)
+    coeffs_o_b = (1.07044083, 1.10202242, 0)
+    coeffs_o_c = (1.00585997 * 1e-2, 100, 0)
 
-    n_o = two_term_sellmeier(
+    n_o = sellmeier(
         lambda_micron,
         coeff_o_a,
         coeffs_o_b,
@@ -732,7 +638,7 @@ def quartz(
         derivative_order=derivative,
         as_sympy=as_sympy,
     )
-    n_e = two_term_sellmeier(
+    n_e = sellmeier(
         lambda_micron,
         coeff_e_a,
         coeffs_e_b,
@@ -783,14 +689,14 @@ def calcite(
 
     """
     coeff_e_a = 0.35859695
-    coeffs_e_b = (0.82427380, 0.14429128)
-    coeffs_e_c = (1.06689543 * 1e-2, 120)
+    coeffs_e_b = (0.82427380, 0.14429128, 0)
+    coeffs_e_c = (1.06689543 * 1e-2, 120, 0)
 
     coeff_o_a = 0.73358749
-    coeffs_o_b = (0.96464345, 1.82831454)
-    coeffs_o_c = (1.94325203 * 1e-2, 120)
+    coeffs_o_b = (0.96464345, 1.82831454, 0)
+    coeffs_o_c = (1.94325203 * 1e-2, 120, 0)
 
-    n_o = two_term_sellmeier(
+    n_o = sellmeier(
         lambda_micron,
         coeff_o_a,
         coeffs_o_b,
@@ -798,7 +704,7 @@ def calcite(
         derivative_order=derivative,
         as_sympy=as_sympy,
     )
-    n_e = two_term_sellmeier(
+    n_e = sellmeier(
         lambda_micron,
         coeff_e_a,
         coeffs_e_b,
@@ -853,7 +759,7 @@ def mgf2(
     coeff_o_a = 0
     coeffs_o_b = (0.48755108, 0.39875031, 2.3120353)
     coeffs_o_c = (0.04338408**2, 0.09461442**2, 23.793604**2)
-    n_o = three_term_sellmeier(
+    n_o = sellmeier(
         lambda_micron,
         coeff_o_a,
         coeffs_o_b,
@@ -861,7 +767,7 @@ def mgf2(
         derivative_order=derivative,
         as_sympy=as_sympy,
     )
-    n_e = three_term_sellmeier(
+    n_e = sellmeier(
         lambda_micron,
         coeff_e_a,
         coeffs_e_b,
