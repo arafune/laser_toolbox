@@ -7,21 +7,21 @@ import laser_toolbox as ltb
 
 
 @pytest.mark.parametrize(
-    ("material", "wavelength", "refractive_index"),
+    ("material", "wavelength", "gvd"),
     [
         ("bk7", 0.800, 44.651),
-        ("beta_bbo", 0.800, (71.864, 56.883)),
+        ("beta_bbo", 0.800, (75.5438, 58.831262)),
     ],
 )
 def test_gvd(
     material: str,
     wavelength: float,
-    refractive_index: float,
+    gvd: float,
 ) -> None:
     """Test for gvd calculation of 'material' at 'wavelength'."""
     np.testing.assert_allclose(
         ltb.gvd(wavelength, material),
-        refractive_index,
+        gvd,
         rtol=0.0001,
     )
 

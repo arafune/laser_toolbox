@@ -531,6 +531,61 @@ def beta_bbo(
     *,
     as_sympy: bool = False,
 ) -> ScalarOrArray | tuple[sp.Expr, sp.Expr]:
+    r"""Dispersion of :math:`$\beta$`-BBO.
+
+
+    https://refractiveindex.info/?shelf=main&book=BaB2O4&page=Tamosauskas-e
+    https://refractiveindex.info/?shelf=main&book=BaB2O4&page=Tamosauskas-o
+
+    1. G. Tamošauskas, G. Beresnevičius, D. Gadonas, A. Dubietis. Transmittance and phase matching of BBO crystal in the 3−5 μm range and its application for the characterization of mid-infrared laser pulses. Opt. Mater. Express 8, 1410-1418 (2018)
+    2. G. Tamošauskas. β-barium borate (BBO) absorption in the 0.188-6.22 μm range. arXiv:2111.01212 [physics.optics] (2021)
+
+        wave length range = (0.188, 5.2)  µm
+
+    """
+    coeff_e_a = 0.0
+    coeffs_e_b = (1.151075, 0.21803, 0.656)
+    coeffs_e_c = (0.007142, 0.02259, 263.0)
+
+    coeff_o_a = 0.0
+    coeffs_o_b = (0.90291, 0.83155, 0.76536)
+    coeffs_o_c = (0.003926, 0.018786, 60.01)
+
+    n_o = sellmeier(
+        lambda_micron,
+        coeff_o_a,
+        coeffs_o_b,
+        coeffs_o_c,
+        derivative_order=derivative,
+        as_sympy=as_sympy,
+    )
+    n_e = sellmeier(
+        lambda_micron,
+        coeff_e_a,
+        coeffs_e_b,
+        coeffs_e_c,
+        derivative_order=derivative,
+        as_sympy=as_sympy,
+    )
+    if as_sympy:
+        assert isinstance(n_o, sp.Expr)
+        assert isinstance(n_e, sp.Expr)
+        return (n_o, n_e)
+    return np.stack(
+        [
+            np.asarray(n_o, dtype=float),
+            np.asarray(n_e, dtype=float),
+        ],
+        axis=-1,
+    )
+
+
+def beta_bbo_old(
+    lambda_micron: ScalarOrArray,
+    derivative: int = 0,
+    *,
+    as_sympy: bool = False,
+) -> ScalarOrArray | tuple[sp.Expr, sp.Expr]:
     r"""Return :math:`n_o` and :math:`n_e` of :math:`\beta`-BBO.
 
     https://refractiveindex.info/?shelf=main&book=BaB2O4&page=Eimerl-o

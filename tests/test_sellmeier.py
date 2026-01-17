@@ -248,7 +248,7 @@ def test_phase_matching_angle_bbo_at_800() -> None:
     """Verify the SHG phase-matching angle for BBO at 800 nm fundamental wavelength."""
     np.testing.assert_allclose(
         sellmeier.phase_matching_angle_bbo(0.800),
-        29.02,
+        29.21,
         atol=0.01,
     )
 
@@ -257,7 +257,7 @@ def test_phase_matching_angle_bbo_at_790() -> None:
     """Verify the SHG phase-matching angle for BBO at 790 nm fundamental wavelength."""
     np.testing.assert_allclose(
         sellmeier.phase_matching_angle_bbo(0.790),
-        29.4,
+        29.58,
         atol=0.01,
     )
 
